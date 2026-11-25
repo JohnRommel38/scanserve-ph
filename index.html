@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScanServe PH</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="top">
+    <div class="brand">ScanServe PH <span>demo</span></div>
+    <button class="ghost" id="resetBtn">Reset</button>
+    <nav class="tabs">
+      <button class="tab tab-guest" data-view="guest">Guest</button>
+      <button class="tab" data-view="staff">Staff</button>
+      <button class="tab" data-view="admin">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Guest phone -->
+    <section class="view" id="guestView">
+      <div class="demo">
+        <label for="tableSelect">Scanned table:</label>
+        <select id="tableSelect"></select>
+        <span>Sample menu</span>
+      </div>
+      <div class="phone">
+        <div class="phone-body" id="phoneBody"></div>
+        <div id="phoneFooter"></div>
+        <div id="phoneSheet"></div>
+      </div>
+    </section>
+
+    <!-- Staff order queue -->
+    <section class="view" id="staffView"></section>
+
+    <!-- Admin -->
+    <section class="view" id="adminView"></section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
