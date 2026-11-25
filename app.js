@@ -45,7 +45,6 @@ const SAVE_KEY = 'scanserve-demo';
 function newData() {
   const now = Date.now();
   return {
-    tableCode: 'g3y8an',
     cart: [],
     nextOrderNo: 1003,
     orders: [
@@ -82,6 +81,7 @@ function saveData() {
 let data = loadData() || newData();
 
 // screen state (not saved)
+let tableCode = '';
 let screen = 'menu';
 let popup = null;
 let payMethod = 'GCash';
@@ -349,15 +349,7 @@ function statusScreen(table) {
 }
 
 function renderGuest() {
-  // table dropdown
-  let options = '';
-  TABLES.forEach(table => {
-    const selected = table.code === data.tableCode ? 'selected' : '';
-    options += `<option value="${table.code}" ${selected}>${table.name}</option>`;
-  });
-  document.getElementById('tableSelect').innerHTML = options;
-
-  const table = findTableByCode(data.tableCode);
+  const table = findTableByCode(tableCode);
   let body = '';
   let footer = '';
   let sheet = '';
@@ -448,7 +440,7 @@ function qrTab() {
       <div class="qr-card">
         <b>${table.name}</b>
         <div class="qr" data-link="${tableLink(table)}"></div>
-        <button class="btn light" data-action="open-table" data-code="${table.code}">Open</button>
+        <a class="btn light" href="#t-${table.code}" target="_blank">Open</a>
       </div>`;
   });
   return `<p class="small">Print one code per table. Scanning it opens that table's menu.</p>
@@ -524,11 +516,14 @@ function goTo(newScreen) {
   window.scrollTo(0, 0);
 }
 
-// open the right table when a QR link is scanned
+// QR link (#t-code) opens the guest menu only
 function readLink() {
   const hash = location.hash.slice(1);
-  if (hash.startsWith('t-')) {
-    data.tableCode = hash.slice(2);
+  const isGuest = hash.startsWith('t-');
+  document.body.classList.toggle('guest-mode', isGuest);
+
+  if (isGuest) {
+    tableCode = hash.slice(2);
     currentView = 'guest';
     screen = 'menu';
   } else {
@@ -604,18 +599,12 @@ document.addEventListener('click', event => {
     adminTab = button.dataset.tab;
   }
 
-  if (action === 'open-table') {
-    data.tableCode = button.dataset.code;
-    screen = 'menu';
-    currentView = 'guest';
-  }
-
   render();
 });
 
 // show "confirming", then send order to staff
 function payNow() {
-  const table = findTableByCode(data.tableCode);
+  const table = findTableByCode(tableCode);
   const lines = data.cart.slice();
   const method = payMethod;
 
@@ -649,15 +638,15 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 document.addEventListener('change', event => {
   const input = event.target;
 
-  if (input.id === 'tableSelect') {
-    data.tableCode = input.value;
-    screen = 'menu';
-    popup = null;
-    render();
-  }
-
   if (input.name === 'pay-method') payMethod = input.value;
   if (input.name === 'item-option' && popup) popup.option = input.value;
+});
+
+// new orders from another tab show up here
+window.addEventListener('storage', event => {
+  if (event.key !== SAVE_KEY) return;
+  data = loadData() || newData();
+  render();
 });
 
 window.addEventListener('hashchange', () => {
